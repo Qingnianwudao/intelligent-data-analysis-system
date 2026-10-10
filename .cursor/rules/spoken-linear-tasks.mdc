@@ -1,0 +1,58 @@
+---
+description: 口语管理开发任务；Markdown 阶段计划同步为 Linear Todo
+alwaysApply: true
+---
+
+# 口语化任务与 Linear 联动
+
+## 配置（仅改这里）
+
+```yaml
+# 修改下列值以匹配你的 Linear 工作区；Agent 执行本规则时必须优先读取此处。
+project:
+  name: "NL2SQL"
+  team: "NL2SQL" # Linear 团队：名称、ID 或 Key（与控制台一致即可）
+```
+
+## 何时生效
+
+当用户使用**日常口语**表达与开发任务相关的意图时（例如：「开始做登录功能」「登录做完了」「把搜索那个单子先停一下」「切到 MYSQL-3」），按下面流程执行，**不要只给文字建议而不调用工具**（在已启用 Linear MCP 的前提下）。
+
+当用户**用 Markdown 写阶段计划**（如 `## Phase 0`、`## Phase 1`、`Phase2：`）并要求**同步到 Linear**、**建成 Todo**、**与计划对齐**时，按 **「Markdown 计划同步」** 一节执行。
+
+## Markdown 计划同步到 Linear
+
+1. **解析**：从用户粘贴内容或仓库内 `.md` / `.mdc` 计划文件读取每个阶段；识别 `## Phase 0`～`Phase 3`、`## Phase0`、中文「阶段」等同级标题，正文取该标题下至下一同级标题之前（可含表格与列表）。
+2. **去重**：`list_issues(team=配置.team, query="[Plan]")` 或按 `Phase` 搜索；若已存在相同或极相似标题，询问**跳过**、**仅更新描述**（`save_issue` 传 `id`）或**新建**。
+3. **创建**：对每个阶段调用 `save_issue`：`title` 用 `[Plan] Phase N：<短标题>`（与文档一致）；`team` 用配置；`state` 默认 `Todo`；`description` 写入该阶段摘要与要点（Markdown，控制长度）。
+4. **回复**：列出新建 Issue 的编号与 URL（团队 Key 为 `MYSQL` 时形如 `MYSQL-n`）。
+
+**建议文档格式**：每阶段用独立二级标题，例如 `## Phase 0：前后端基础框架`，便于稳定解析。
+
+## 意图与 Linear 状态映射
+
+| 用户口语（示例） | 建议 `save_issue` 的 `state` |
+|------------------|------------------------------|
+| 开始 / 开工 / 做起来了 | `In Progress` |
+| 做完 / 搞定 / 结了 / 上线前收尾 | `Done` |
+| 暂停 / 先不搞 / 放回待办 | `Todo` 或 `Backlog`（优先与工作区习惯一致） |
+| 取消 / 不要了 | `Canceled`（需用户确认） |
+
+若用户**直接说出 Issue 标识**（如 `MYSQL-1`），以该标识为唯一目标，可跳过标题搜索。
+
+## 必须执行的步骤
+
+1. **定位 Issue**：用 MCP `list_issues`，传入上面配置中的 `team`，并用用户描述中的关键词作为 `query`（如「登录」）。若结果多条，列出编号与标题请用户选一条；若零条，说明未找到并建议新建 Issue 或换关键词。
+2. **更新状态**：用 MCP `save_issue`，传入 `id`（Issue 标识如 `MYSQL-1`）与上表映射的 `state`。仅当无法确定对应关系时再问一句，不要反复追问已明确的信息。
+3. **推荐分支**：在回复中**单独给出**推荐分支名，并说明可基于当前默认分支检出：
+   - 已匹配到 Issue `TEAMKEY-N` 时：`feat/<teamkey>-<n>-<short-slug>`，例如 Issue `MYSQL-1`、功能「登录」→ `feat/mysql-1-login`（`short-slug` 用小写英文或拼音，避免空格与中文）。
+   - 未匹配到 Issue 时：`feat/<short-slug>`，并提示关联 Linear 后再补前缀。
+4. **失败时**：若 MCP 报错或未授权，明确告知原因与建议在 Linear 网页上手动操作，不要假装已更新。
+
+## 可选
+
+- 复杂检索、跨团队或「创建并指派」等多步操作，可使用 MCP `research`，传入自然语言说明目标与上面 `team` 配置。
+
+## 示例
+
+- 用户：「开始做登录功能」→ `list_issues(team=配置.team, query="登录")` → 选中一条 → `save_issue(id=…, state="In Progress")` → 输出：`git checkout -b feat/mysql-1-login`（以实际 Issue 为准）。
