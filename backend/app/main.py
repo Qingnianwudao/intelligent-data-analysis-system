@@ -16,7 +16,7 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-app = FastAPI(title="NL2SQL API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Intelligent Data Analysis System API", version="0.2.0", lifespan=lifespan)
 
 _s = get_settings()
 _origins = [o.strip() for o in _s.cors_origins.split(",") if o.strip()]

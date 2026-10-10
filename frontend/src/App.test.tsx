@@ -13,7 +13,7 @@ describe("LoginPage", () => {
         </AuthProvider>
       </MemoryRouter>,
     );
-    expect(screen.getByRole("heading", { name: /NL2SQL/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Intelligent Data Analysis System/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /进入系统/i })).toBeInTheDocument();
   });
 });

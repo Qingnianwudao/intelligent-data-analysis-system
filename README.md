@@ -1,4 +1,4 @@
-# NL2SQL · 智能数据分析系统
+# Intelligent Data Analysis System
 
 ## 环境要求
 

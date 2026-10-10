@@ -31,7 +31,7 @@ export function LoginPage() {
   return (
     <div className="login-page login-page--tech">
       <div className="login-card">
-        <h1 className="login-title">NL2SQL</h1>
+        <h1 className="login-title">Intelligent Data Analysis System</h1>
         <p className="login-sub">智能数据分析 · 后端鉴权</p>
         <form className="login-form" onSubmit={onSubmit}>
           {error ? <p className="login-error">{error}</p> : null}

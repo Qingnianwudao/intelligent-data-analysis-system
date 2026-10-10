@@ -19,8 +19,8 @@ export function WorkspacePage() {
     <div className="workspace workspace--tech">
       <header className="workspace-top">
         <div className="brand">
-          <span className="brand-mark">NL2SQL</span>
-          <span className="brand-tag">智能分析 · NL2SQL</span>
+          <span className="brand-mark">IDAS</span>
+          <span className="brand-tag">Intelligent Data Analysis System</span>
         </div>
         <button type="button" className="btn-ghost" onClick={handleLogout}>
           退出登录
